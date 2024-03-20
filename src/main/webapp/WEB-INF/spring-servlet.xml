@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/util 
+                        http://www.springframework.org/schema/util/spring-util.xsd
+                        http://www.springframework.org/schema/tx 
+                        http://www.springframework.org/schema/tx/spring-tx.xsd
+                        http://www.springframework.org/schema/mvc 
+                        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+
+	<!-- Enable Transaction write operation annotation -->
+	<tx:annotation-driven />
+	
+	<context:component-scan
+		base-package="com.crud"></context:component-scan>
+		
+		
+		<!-- Access static resource -->
+	<mvc:annotation-driven />
+	<mvc:resources location="/WEB-INF/resources/" mapping="/resources/**"></mvc:resources>
+		
+		
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		name="viewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+
+	<!-- Creating DataSource bean -->
+	<bean
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		name="data_Source">
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/ajaxcrucspringmvc"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="Shivam@123"></property>
+	</bean>
+
+	<!-- Creating LocalSessionFactoryBean bean -->
+	<bean
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+		name="factory">
+
+		<!-- datasource property -->
+		<property name="dataSource" ref="data_Source"></property>
+
+		<!-- hibernateProperties -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+
+		<!-- annotated classes property -->
+		<property name="annotatedClasses">
+			<list>
+				<value>com.crud.model.Employee</value>
+				<value>com.crud.model.Student</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Creating HibernateTemplate bean -->
+	<bean class="org.springframework.orm.hibernate5.HibernateTemplate"
+		name="hibernateTemplate">
+		<property name="sessionFactory" ref="factory"></property>
+	</bean>
+
+
+	<!-- HibernateTransactionManager to enable write operation on database -->
+	<bean
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+		name="transactionManager">
+		<property name="sessionFactory" ref="factory"></property>
+	</bean>
+
+</beans>
